@@ -1,10 +1,19 @@
 # SageMaker-HyperPod-Step-By-Step
-아래의 가이드는 두 개의 자료를 기반으로 하였습니다. Amazon SageMaker HyperPod Workshop 는 HyperPod 의 환경 세팅을 주로 참고 하였고, 거의 내용이 비슷합니다. 하지만, 일부 에러 및 추가 설명을 하였습니다. 아래 내용과 같이 보셔도 좋습니다. Get Started Training Llama 2 with PyTorch FSDP in 5 Minutes 는 Llama2 의 모델 훈련을 실행하는데 초점을 두었습니다. 
+아래의 가이드는 두 개의 자료를 기반으로 하였습니다. Amazon SageMaker HyperPod Workshop 은 HyperPod 의 환경 세팅을 주로 참고 하였고, 거의 내용이 비슷합니다. 하지만, 일부 에러 및 추가 설명을 하였습니다. 아래 내용과 같이 보셔도 좋습니다. Get Started Training Llama 2 with PyTorch FSDP in 5 Minutes 는 Llama2 의 모델 훈련을 실행하는데 초점을 두었습니다. 
 - [Amazon SageMaker HyperPod Workshop](https://catalog.workshops.aws/sagemaker-hyperpod/en-US)
 - [Get Started Training Llama 2 with PyTorch FSDP in 5 Minutes](https://github.com/aws-samples/awsome-distributed-training/tree/main/3.test_cases/10.FSDP)
 
 
 # 1. Environment
+전체적인 환경은 (1) VPC, (2) 공용 스토리지로써 FsX Luster, (3) 클러스터 생성 및 접근을 위한 Client 역할을 하는 Cloud9, (4) HyperPod 클러스터, (5) LifeCycle Scripts 등이 저장되는 S3 Bucket, (6) 클러스터안에서 훈련 잡을 수행하는 IAM Role 로 구성되어 있습니다
+- 아키텍처
+    - ![architecture](img/architecture.png)
+- Region: 
+    - 아래 가이드는 us-east-1 에서 실행 하였습니다.
+- 선제 필수 요건
+    - ml.g5.48xlarge 4 개가 실행할 계정에 Quota 배정이 되어 있어야 합니다.
+    - ![quota](img/quota.png)
+    - ml.c5.xlarge 1개가 실행할 계정에 Quota 배정이 되어 있어야 합니다.
 
 # 2. Setup Infra Environment
 ## 2.1. Create VPC: 
@@ -26,15 +35,15 @@
 - 모두 디폴트로 하시면 되고, 아래 항목만 주의 하세요.
 - "Create VPC" 단계의 Stack name 을 `NetworkStack` 항목의 이름인 `sagemakervpc` 와 일치 시켜야 합니다. 변경시 (예: `sagemakervpc02`) 이름을 일치 시켜야 합니다.
 ## 2.3. Cloud9 설치
-    - 설치는 아래 경로를 참조해서 해주시기 바랍니다.
-        - ![ClOUD9 설치](https://catalog.workshops.aws/sagemaker-hyperpod/en-US/00-setup/02-own-account)
+- 설치는 아래 경로를 참조해서 해주시기 바랍니다.
+    - [Clioud9 설치](https://catalog.workshops.aws/sagemaker-hyperpod/en-US/00-setup/02-own-account)
+
 ## 2.4. Setup Cloud9
 * install AWS CLI
     ```
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install --update
-            aws --version
+    unzip awscliv2.zip
+    sudo ./aws/install --update
     ```
 - First we need to disable the temporary credentials provided by Cloud9. Click on settings in the upper right hand corner > ⚙️ icon. Select AWS Settings > Disable aws managed temporary credentials
     - ![cloud9_role.png](img/cloud9_role.png)
@@ -45,7 +54,7 @@
     ```
     aws --version
     ```    
-- AWSCloud9SSMAccessRole 에 아래와 같은 권한 추가 필요 합니다.
+- AWSCloud9SSMAccessRole 에 아래와 같은 권한 추가 필요 합니다. IAM Console 에서 이 Role 을 찾고 아래 정책을 추가 해주세요. 
     * AmazonS3FullAccess
     * AmazonSageMakerFullAccess
     * AmazonSSMFullAccess
@@ -179,7 +188,7 @@
     source ~/environment/env_vars
     ```
 - Create cluster-config.json:
-    - [중요] InstanceType, InstanceCount 를 수정해서 사용하세요.
+    - [중요] 필요시 InstanceType, InstanceCount 를 수정해서 사용하세요.
     ```
     cat > cluster-config.json << EOL
     {
@@ -240,6 +249,7 @@
     aws s3 cp provisioning_parameters.json s3://${BUCKET}/src/
     ```
 - Verify configuration on S3
+    - [중요] "fsx_dns_name" 이름이 잘 기재되었는지 확인이 필요 합니다.
     ```
     aws s3 cp s3://${BUCKET}/src/provisioning_parameters.json -
     ```    
@@ -319,7 +329,7 @@
     ```
     exit
     ```
-# 7. Train LLama2
+# 7. Train Llama2
 - Git Repo:  https://github.com/aws-samples/awsome-distributed-training/
 - Log in as ubuntu on HeadNode
     ```
@@ -435,7 +445,9 @@
     - 아래는 최종 실행이 완료된 결과 입니다.
         - ![result_02](img/result_02.jpg)
 
-
+# 8 리소스 정리
+- **아래를 참조하셔서 리소스 정리 꼭 해주세요. 엄청난 돈이 지불 될 수 있습니다.**
+    - [CleanUp](https://catalog.workshops.aws/sagemaker-hyperpod/en-US/06-cleanup)
 
 
 
