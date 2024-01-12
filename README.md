@@ -1,12 +1,34 @@
 # SageMaker-HyperPod-Step-By-Step
+아래의 가이드는 두 개의 자료를 기반으로 하였습니다. Amazon SageMaker HyperPod Workshop 는 HyperPod 의 환경 세팅을 주로 참고 하였고, 거의 내용이 비슷합니다. 하지만, 일부 에러 및 추가 설명을 하였습니다. 아래 내용과 같이 보셔도 좋습니다. Get Started Training Llama 2 with PyTorch FSDP in 5 Minutes 는 Llama2 의 모델 훈련을 실행하는데 초점을 두었습니다. 
+- [Amazon SageMaker HyperPod Workshop](https://catalog.workshops.aws/sagemaker-hyperpod/en-US)
+- [Get Started Training Llama 2 with PyTorch FSDP in 5 Minutes](https://github.com/aws-samples/awsome-distributed-training/tree/main/3.test_cases/10.FSDP)
+
 
 # 1. Environment
 
 # 2. Setup Infra Environment
-## Create VPC: 
-## Create FSX Luster
-## Cloud9 설치
-## Setup Cloud9
+## 2.1. Create VPC: 
+- 새로운 창을 열고 아래의 URL 을 붙여 넣기 하시고, 스텝에 따라 해주세요. 
+    ```
+    https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://awsome-distributed-training.s3.amazonaws.com/templates/Vpc.yaml&stackName=sagemakervpc
+    ```    
+    - 아래를 제외하고는 모두 디폴트로 넣어 주셔도 됩니다.
+    - Stack name 은 디폴트로 `sagemakervpc` 로 사용하셔도 됩니다. 만일 이 이름을 변경하면 (예: `sagemakervpc02`), 두 번재 스텝인 "Create FSX Luster" 단계의 `NetworkStack`항목의 이름인 `sagemakervpc` 와 일치 시켜야 합니다. 
+    - [중요] Availability Zone configuration for the subnets 항목의 값을 수정해야 합니다.
+        - us-east-1 에서 실행의 경우에는 use1-az1, use1-az2 와 같은 값을 제공해야 합니다.
+        - 아래는 관련 에러 화면 입니다. 참고 하세요.
+            - ![VPC_error.png](img/VPC_error.png)
+## 2.2. Create FSX Luster
+- 새로운 창을 열고 아래의 URL 을 붙여 넣기 하시고, 스텝에 따라 해주세요. 
+    ```
+    https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://awsome-distributed-training.s3.amazonaws.com/templates/FSxLustre.yaml&stackName=fsxlustre&param_NetworkStack=sagemakervpc
+    ```
+- 모두 디폴트로 하시면 되고, 아래 항목만 주의 하세요.
+- "Create VPC" 단계의 Stack name 을 `NetworkStack` 항목의 이름인 `sagemakervpc` 와 일치 시켜야 합니다. 변경시 (예: `sagemakervpc02`) 이름을 일치 시켜야 합니다.
+## 2.3. Cloud9 설치
+    - 설치는 아래 경로를 참조해서 해주시기 바랍니다.
+        - ![ClOUD9 설치](https://catalog.workshops.aws/sagemaker-hyperpod/en-US/00-setup/02-own-account)
+## 2.4. Setup Cloud9
 * install AWS CLI
     ```
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -23,11 +45,19 @@
     ```
     aws --version
     ```    
+- AWSCloud9SSMAccessRole 에 아래와 같은 권한 추가 필요 합니다.
+    * AmazonS3FullAccess
+    * AmazonSageMakerFullAccess
+    * AmazonSSMFullAccess
+    * AmazonSSMManagedInstanceCore
+    * AWSCloud9SSMInstanceProfile
+    * IAMFullAccess.
+    - ![ssmrole.png](img/ssmrole.png)
+
+
 
 # 3. Setup Role, Bucket
-```
-```
-## Create IAM Role and Policy
+## 3.1. Create IAM Role and Policy
  - source in all the environment variables 
     ```bash
     cd ~/environment
@@ -40,6 +70,7 @@
     cat ~/environment/env_vars
     ```
 - Create IAM Role    
+    - 여기서는 `AmazonSagemakerClusterExecutionRole-Demo` 의 이름으로 생성함. 필요시에 이 이름을 수정하면 되고, 아래 언급된 모든 곳에 "이름"을 수정해야 합니다.
     ```bash
     cat > trust_relationship.json << EOF
     {
@@ -116,14 +147,7 @@
         --role-name AmazonSagemakerClusterExecutionRole-Demo \
         --policy-arn $POLICY
     ```
-- AWSCloud9SSMAccessRole 의 권한 추가 
-    * AmazonS3FullAccess
-    * AmazonSageMakerFullAccess
-    * AmazonSSMFullAccess
-    * AmazonSSMManagedInstanceCore
-    * AWSCloud9SSMInstanceProfile
-    * IAMFullAccess.
-## Create S3 bucket and Lifecycle script
+## 3.2. Create S3 bucket and Lifecycle script
 - Create bucket
     ```
     # generate a unique name for the bucket
@@ -258,6 +282,7 @@
 # 6. SSH Access to compute node
 - move the ubuntu user home directory to /fsx/ubuntu
     - ubuntu 유저가 로그인이 되어 있어, usermod 명령어 실행시에 에러가 발생하면 `ps -ef | grep ubuntu` 를 통해서 프로세스를 확인하고, 프로세스를 죽입니다.
+    - ![usermod_erro.png](img/usermod_error.png)
     ```
     sudo su # go back to root user
     usermod -m -d /fsx/ubuntu ubuntu
@@ -294,7 +319,7 @@
     ```
     exit
     ```
-# 6. Train LLama2
+# 7. Train LLama2
 - Git Repo:  https://github.com/aws-samples/awsome-distributed-training/
 - Log in as ubuntu on HeadNode
     ```
@@ -404,11 +429,12 @@
     ls
     tail -30 sluum-1.out
     ```    
+- 실형 결과 화면
+    - 아래는 훈련이 진행되고 있고, 4개의 Compute Node 에서의 GPU 사용 현황을 보고 있습니다.
+        - ![result_01](img/result_01.jpg)
+    - 아래는 최종 실행이 완료된 결과 입니다.
+        - ![result_02](img/result_02.jpg)
 
-
-
-
-# 참조 자료
 
 
 
