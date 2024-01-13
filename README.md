@@ -318,7 +318,6 @@
 - ensure all compute nodes have the same home directory
     - [중요] 아래에서 "4" 는 Compute Node 개수 만큼 기술 해야 합니다. 
     ```
-    sudo su # go back to root user
     srun -N 4 usermod -d /fsx/ubuntu ubuntu
     ```
 - login as ubuntu and ensure the home directory is correct:
