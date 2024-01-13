@@ -72,13 +72,25 @@
 # 3. Setup Role, Bucket
 ## 3.1. Create IAM Role and Policy
  - 다시 Cloud9 콘솔로 되돌아 옵니다.
- - source in all the environment variables 
+ - create_config.sh 를 다운로드 합니다.
     ```bash
     cd ~/environment
-    curl 'https://static.us-east-1.prod.workshops.aws/public/5f0540d3-5a46-474e-87cd-ad022949e30c/static/scripts/create_config.sh' --output create_config.sh
+    curl 'https://static.us-east-1.prod.workshops.aws/public/5f0540d3-5a46-474e-87cd-ad022949e30c/static/scripts/create_config.sh' --output create_config.sh    
+    ```
+- create_config.sh 안에 VPC, FsX Luster 를 생성하기 위한 스택 이름이 "하드 코딩" 되어 있습니다. 아래 이름을 사용하셨다고 하면, 에러 없이 작업이 될 것이고, 만약에 이름이 수정 되었으면 아래를 변경 해주세요.  (예: sagemakervpc01,fsxlustre01 )
+    ```
+    : "${STACK_ID_VPC:=sagemakervpc}"
+    : "${STACK_ID_FSX:=fsxlustre}"
+    ```
+ -  ~/environment/env_vars 에 변수를 저장하기 위해서 셀을 실행 합니다.
+    ```bash
     bash create_config.sh
+    ```
+ - 모든 환경 변수를 적용 합니다.
+     ```bash
     source ~/environment/env_vars
     ```
+
 - Confirm all the environment variables were correctly set:
     ```
     cat ~/environment/env_vars
