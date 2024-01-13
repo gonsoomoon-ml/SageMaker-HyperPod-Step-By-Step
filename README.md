@@ -62,8 +62,8 @@
     * AmazonSageMakerFullAccess
     * AmazonSSMFullAccess
     * AmazonSSMManagedInstanceCore
+    * IAMFullAccess.    
     * AWSCloud9SSMInstanceProfile
-    * IAMFullAccess.
     - ![ssmrole.png](img/ssmrole.png)
 
 
