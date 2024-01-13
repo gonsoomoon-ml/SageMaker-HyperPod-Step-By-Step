@@ -434,8 +434,10 @@
     # Llama 2 Training Params ##
     ############################
 
+    # max_context_width=4096 --> 2048
+
     declare -a TRAINING_ARGS=(
-        --max_context_width=4096 \
+        --max_context_width=2048 \
         --num_key_value_heads=32 \ # 7b: 32 13b: 40 70b: 8
         --llama_intermediate_size=11008 \ # 7b: 11008 13b: 13824 70b: 28672
         --hidden_width=4096 \ # 7b: 4096 13b: 5120 70b: 8192
@@ -472,13 +474,28 @@
     ```    
 - 실형 결과 화면
     - 아래는 훈련이 진행되고 있고, 4개의 Compute Node 에서의 GPU 사용 현황을 보고 있습니다.
-        - ![result_01](img/result_01.jpg)
+        - ![result_01](img/train-exec.png)
     - 아래는 최종 실행이 완료된 결과 입니다.
         - ![result_02](img/result_02.jpg)
 
-# 8 리소스 정리
+# 8. 리소스 정리
 - **아래를 참조하셔서 리소스 정리 꼭 해주세요. 엄청난 돈이 지불 될 수 있습니다.**
-    - [CleanUp](https://catalog.workshops.aws/sagemaker-hyperpod/en-US/06-cleanup)
+    - Delete the S3 bucket:
+        ```
+        aws s3 rb --force s3://${BUCKET}
+        ```
+    - Delete the cluster
+        ```
+        aws sagemaker delete-cluster --cluster-name ${CLUSTER_NAME}
+        ```
+    - Delete FsX Luster
+        - CloudFormation Service 에석 생성한 스택을 삭제 합니다. 
+            - 참조: [AWS CloudFormation 콘솔에서 스택 삭제](https://docs.aws.amazon.com/ko_kr/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html)
+    - Delete VPC
+        - FsX Luster 와 동일하게 삭제 합니다.
+    - Delete Cloud9
+        - Cloud9 에서 삭제 합니다.
+    
 
 
 
