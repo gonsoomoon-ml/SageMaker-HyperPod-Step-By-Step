@@ -36,7 +36,7 @@
 - "Create VPC" 단계의 Stack name 을 `NetworkStack` 항목의 이름인 `sagemakervpc` 와 일치 시켜야 합니다. 변경시 (예: `sagemakervpc02`) 이름을 일치 시켜야 합니다.
 ## 2.3. Cloud9 설치
 - 설치는 아래 경로를 참조해서 해주시기 바랍니다.
-    - [Clioud9 설치](https://catalog.workshops.aws/sagemaker-hyperpod/en-US/00-setup/02-own-account)
+    - [Clioud9 설치](https://catalog.workshops.aws/sagemaker-hyperpod/en-US/00-setup/02-own-account){:target="_blank"}
 
 ## 2.4. Setup Cloud9
 * install AWS CLI
