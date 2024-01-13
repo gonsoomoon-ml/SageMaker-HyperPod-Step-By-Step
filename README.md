@@ -311,6 +311,7 @@
     - ubuntu 유저가 로그인이 되어 있어, usermod 명령어 실행시에 에러가 발생하면 `ps -ef | grep ubuntu` 를 통해서 프로세스를 확인하고, 프로세스를 죽입니다.
     - ![usermod_erro.png](img/usermod_error.png)
     ```
+    exit
     sudo su # go back to root user
     usermod -m -d /fsx/ubuntu ubuntu
     ```
