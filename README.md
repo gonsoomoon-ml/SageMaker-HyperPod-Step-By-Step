@@ -280,6 +280,8 @@
     ```
     aws sagemaker describe-cluster --cluster-name $CLUSTER_NAME --region $AWS_REGION
     ```
+- 약 15-20분 이후에 클러스터가 생성 됨.
+    - ![cluster-details](img/cluster_detail.png)    
 
 # 5. Setup Cluster 
 -  install the SSM Session Manager Plugin
@@ -374,6 +376,18 @@
     - `declare -a TORCHRUN_ARGS=( --nproc_per_node=8` 
     - 아래는 포트 번호를 지정 해줍니다. (수정 안하셔도 됩니다.)
         - `--rdzv_endpoint=$(hostname):29500 \`
+    - 아래의 파라미터는 추가 했습니다. 추가해서 사용하세요.
+        ```
+        --train_batch_size=1 \
+        --val_batch_size=4 \
+        --epochs=1 \
+        --validation_batches=1 \   
+        ```     
+    - 아래의 세팅으로 하면 총 5000 번의 Step 이 수행됩니다. 50번 마다 checkpoint 를 남기게 되어 있습니다. 이 또한 적당하게 수정해서 사용하세요.
+        ```
+        --checkpoint_freq=50 \
+        ```           
+
     ```
     #!/bin/bash
 
@@ -432,7 +446,7 @@
         --checkpoint_freq=50 \
         --validation_freq=500 \
         --checkpoint_dir=./checkpoints \
-        --train_batch_size=2 \
+        --train_batch_size=1 \
         --val_batch_size=4 \
         --epochs=1 \
         --validation_batches=1 \    
