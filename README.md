@@ -70,6 +70,7 @@
 
 # 3. Setup Role, Bucket
 ## 3.1. Create IAM Role and Policy
+ - 다시 Cloud9 콘솔로 되돌아 옵니다.
  - source in all the environment variables 
     ```bash
     cd ~/environment
