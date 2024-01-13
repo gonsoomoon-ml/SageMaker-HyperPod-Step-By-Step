@@ -24,7 +24,7 @@
     - 아래를 제외하고는 모두 디폴트로 넣어 주셔도 됩니다.
     - Stack name 은 디폴트로 `sagemakervpc` 로 사용하셔도 됩니다. 만일 이 이름을 변경하면 (예: `sagemakervpc02`), 두 번재 스텝인 "Create FSX Luster" 단계의 `NetworkStack`항목의 이름인 `sagemakervpc` 와 일치 시켜야 합니다. 
     - [중요] Availability Zone configuration for the subnets 항목의 값을 수정해야 합니다.
-        - us-east-1 에서 실행의 경우에는 use1-az1, use1-az2 와 같은 값을 제공해야 합니다.
+        - us-east-1 에서 실행의 경우에는 use1-az4, use1-az1, use1-az2 와 같은 값을 제공해야 합니다.
         - 아래는 관련 에러 화면 입니다. 참고 하세요.
             - ![VPC_error.png](img/VPC_error.png)
 ## 2.2. Create FSX Luster
@@ -354,7 +354,7 @@
 - modify train parameters in 1.distributed-training.sbatch          
     - 아래 라임을 알맞게 수정하세요.
         - `#SBATCH --nodes=4 # number of nodes to use, 4 p4d(e) = 32 A100 GPUs`
-    - `declare -a TORCHRUN_ARGS=( --nproc_per_node=4` 
+    - `declare -a TORCHRUN_ARGS=( --nproc_per_node=8` 
     - 아래는 포트 번호를 지정 해줍니다. (수정 안하셔도 됩니다.)
         - `--rdzv_endpoint=$(hostname):29500 \`
     ```
@@ -389,7 +389,7 @@
     ###########################
 
     declare -a TORCHRUN_ARGS=(
-        --nproc_per_node=4 \
+        --nproc_per_node=8 \
         --nnodes=$SLURM_JOB_NUM_NODES \
         --rdzv_id=$SLURM_JOB_ID \
         --rdzv_backend=c10d \
